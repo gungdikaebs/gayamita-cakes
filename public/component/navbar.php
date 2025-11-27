@@ -1,6 +1,7 @@
 <?php
 // Tentukan halaman aktif
 $page = isset($_GET['page']) ? $_GET['page'] : 'beranda';
+
 ?>
 
 <nav id="navbar" class="sticky top-0 z-50 transition-all duration-300 bg-transparent px-2">
@@ -37,7 +38,15 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'beranda';
                         <a href="index.php?page=kontak"
                             class="rounded-md px-3 py-2 text-sm font-medium <?php echo $page == 'kontak' ? 'bg-primary/80 text-gray' : 'text-gray-900 hover:bg-primary/60 hover:text-gray'; ?>">Kontak</a>
                     </div>
-                    <div class="flex">
+
+                    <div class="flex ml-14">
+                        <!-- Ikon Keranjang -->
+                        <a href="index.php?page=keranjang" class="relative inline-flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700 hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.35 2.7a1 1 0 00.9 1.3h12.2a1 1 0 00.9-1.3L17 13M7 13V6h13" />
+                            </svg>
+                            <!-- <span id="cart-count" class="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">0</span> -->
+                        </a>
                         <a href="https://wa.me/62881037714200"
                             class="ml-4 inline-flex items-center rounded-full border border-transparent bg-accent px-6 py-2 text-sm font-medium text-gray-900 shadow-sm hover:bg-accent/70 ">Pesan</a>
                     </div>
@@ -57,6 +66,11 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'beranda';
                     class="block rounded-md px-3 py-2 text-base font-medium <?php echo $page == 'produk' ? 'bg-primary/80 text-gray-800' : 'text-gray-700 hover:bg-primary/60 hover:text-gray'; ?>">Produk</a>
                 <a href="index.php?page=kontak"
                     class="block rounded-md px-3 py-2 text-base font-medium <?php echo $page == 'kontak' ? 'bg-primary/80 text-gray-800' : 'text-gray-700 hover:bg-primary/60 hover:text-gray'; ?>">Kontak</a>
+                <a href="index.php?page=keranjang"
+                    class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 hover:bg-primary/60 hover:text-gray">
+                    Keranjang
+                    <span id="cart-count-mobile" class="ml-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+                </a>
             </div>
             <div class="px-4 pb-4  border-gray-200 w-1/2 mx-auto">
                 <a href="" class="block mt-2 rounded-lg bg-accent px-6 py-2 text-center font-medium text-gray-900 shadow-sm hover:bg-accent/70">Pesan</a>

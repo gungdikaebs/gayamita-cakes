@@ -8,7 +8,10 @@ $allowed_pages = [
     'produk' => 'produk.php',
     'kontak' => 'kontak.php',
     'ulasan' => 'ulasan.php',
-    'detail-produk' => 'detail-produk.php'
+    'detail-produk' => 'detail-produk.php',
+    'keranjang' => 'keranjang.php',
+    'get-cart-count' => 'get-cart-count.php'
+
 ];
 
 // Tentukan file mana yang akan di-include
