@@ -134,6 +134,68 @@ CREATE TABLE IF NOT EXISTS `cart_items` (
   CONSTRAINT `fk_cart_items_cart` FOREIGN KEY (`cart_id`) REFERENCES `carts` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Tabel untuk menyimpan data pesanan
+CREATE TABLE IF NOT EXISTS `orders` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `order_number` VARCHAR(50) NOT NULL UNIQUE,
+    `session_id` VARCHAR(128) NOT NULL,
+    `nama_lengkap` VARCHAR(255) NOT NULL,
+    `email` VARCHAR(255) NOT NULL,
+    `no_telepon` VARCHAR(20) NOT NULL,
+    `alamat` TEXT NOT NULL,
+    `kota` VARCHAR(100) NOT NULL,
+    `kode_pos` VARCHAR(10) NOT NULL,
+    `catatan` TEXT NULL,
+    `metode_pembayaran` ENUM('transfer', 'cod') NOT NULL DEFAULT 'transfer',
+    `status` ENUM('pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled') NOT NULL DEFAULT 'pending',
+    `subtotal` INT NOT NULL DEFAULT 0,
+    `ongkir` INT NOT NULL DEFAULT 0,
+    `total` INT NOT NULL DEFAULT 0,
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `session_idx` (`session_id`),
+    KEY `order_number_idx` (`order_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Tabel untuk menyimpan item pesanan
+CREATE TABLE IF NOT EXISTS `orders` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `order_number` VARCHAR(50) NOT NULL UNIQUE,
+    `session_id` VARCHAR(128) NOT NULL,
+    `nama_lengkap` VARCHAR(255) NOT NULL,
+    `email` VARCHAR(255) NOT NULL,
+    `no_telepon` VARCHAR(20) NOT NULL,
+    `alamat` TEXT NOT NULL,
+    `kota` VARCHAR(100) NOT NULL,
+    `kode_pos` VARCHAR(10) NOT NULL,
+    `catatan` TEXT NULL,
+    `metode_pembayaran` ENUM('transfer', 'cod') NOT NULL DEFAULT 'transfer',
+    `status` ENUM('pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled') NOT NULL DEFAULT 'pending',
+    `total` INT NOT NULL DEFAULT 0,
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `session_idx` (`session_id`),
+    KEY `order_number_idx` (`order_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Tabel untuk menyimpan item pesanan
+CREATE TABLE IF NOT EXISTS `order_items` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `order_id` INT NOT NULL,
+    `product_id` INT NOT NULL,
+    `product_name` VARCHAR(255) NOT NULL,
+    `product_image` VARCHAR(255) NULL,
+    `quantity` INT NOT NULL DEFAULT 1,
+    `price` INT NOT NULL DEFAULT 0,
+    `subtotal` INT NOT NULL DEFAULT 0,
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `order_idx` (`order_id`),
+    CONSTRAINT `fk_order_items_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

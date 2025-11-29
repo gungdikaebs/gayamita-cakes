@@ -223,3 +223,130 @@ function clear_cart()
     $stmt->bindParam(':cart_id', $cart_id, PDO::PARAM_INT);
     return $stmt->execute();
 }
+
+// ==================== ORDER FUNCTIONS ====================
+
+// Generate nomor order unik
+function generate_order_number()
+{
+    $prefix = 'GMC';
+    $date = date('Ymd');
+    $random = strtoupper(substr(md5(uniqid()), 0, 6));
+    return $prefix . $date . $random;
+}
+
+// Buat order baru (tanpa ongkir)
+function create_order($data)
+{
+    global $conn;
+    $session_id = get_session_id();
+    $order_number = generate_order_number();
+
+    // Ambil item dari keranjang
+    $cart_items = get_cart_items();
+
+    if (empty($cart_items)) {
+        return false;
+    }
+
+    // Hitung total
+    $total = 0;
+    foreach ($cart_items as $item) {
+        $total += $item['quantity'] * $item['price_snapshot'];
+    }
+
+    try {
+        $conn->beginTransaction();
+
+        // Insert order
+        $sql = "INSERT INTO orders (order_number, session_id, nama_lengkap, email, no_telepon, alamat, kota, kode_pos, catatan, metode_pembayaran, total) 
+                VALUES (:order_number, :session_id, :nama_lengkap, :email, :no_telepon, :alamat, :kota, :kode_pos, :catatan, :metode_pembayaran, :total)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':order_number', $order_number);
+        $stmt->bindParam(':session_id', $session_id);
+        $stmt->bindParam(':nama_lengkap', $data['nama_lengkap']);
+        $stmt->bindParam(':email', $data['email']);
+        $stmt->bindParam(':no_telepon', $data['no_telepon']);
+        $stmt->bindParam(':alamat', $data['alamat']);
+        $stmt->bindParam(':kota', $data['kota']);
+        $stmt->bindParam(':kode_pos', $data['kode_pos']);
+        $stmt->bindParam(':catatan', $data['catatan']);
+        $stmt->bindParam(':metode_pembayaran', $data['metode_pembayaran']);
+        $stmt->bindParam(':total', $total, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $order_id = $conn->lastInsertId();
+
+        // Insert order items
+        $sql = "INSERT INTO order_items (order_id, product_id, product_name, product_image, quantity, price, subtotal) 
+                VALUES (:order_id, :product_id, :product_name, :product_image, :quantity, :price, :subtotal)";
+        $stmt = $conn->prepare($sql);
+
+        foreach ($cart_items as $item) {
+            $item_subtotal = $item['quantity'] * $item['price_snapshot'];
+            $stmt->bindParam(':order_id', $order_id, PDO::PARAM_INT);
+            $stmt->bindParam(':product_id', $item['product_id'], PDO::PARAM_INT);
+            $stmt->bindParam(':product_name', $item['nama']);
+            $stmt->bindParam(':product_image', $item['image']);
+            $stmt->bindParam(':quantity', $item['quantity'], PDO::PARAM_INT);
+            $stmt->bindParam(':price', $item['price_snapshot'], PDO::PARAM_INT);
+            $stmt->bindParam(':subtotal', $item_subtotal, PDO::PARAM_INT);
+            $stmt->execute();
+        }
+
+        // Kosongkan keranjang setelah order berhasil
+        clear_cart();
+
+        $conn->commit();
+
+        return $order_number;
+    } catch (Exception $e) {
+        $conn->rollBack();
+        error_log("Error creating order: " . $e->getMessage());
+        return false;
+    }
+}
+
+// Ambil order berdasarkan order number
+function get_order_by_number($order_number)
+{
+    global $conn;
+    $sql = "SELECT * FROM orders WHERE order_number = :order_number LIMIT 1";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':order_number', $order_number);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+// Ambil item order berdasarkan order ID
+function get_order_items($order_id)
+{
+    global $conn;
+    $sql = "SELECT * FROM order_items WHERE order_id = :order_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':order_id', $order_id, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Hitung total harga keranjang
+function get_cart_total()
+{
+    $items = get_cart_items();
+    $total = 0;
+    foreach ($items as $item) {
+        $total += $item['quantity'] * $item['price_snapshot'];
+    }
+    return $total;
+}
+
+// Hitung jumlah item di keranjang
+function get_cart_item_count()
+{
+    $items = get_cart_items();
+    $count = 0;
+    foreach ($items as $item) {
+        $count += (int)$item['quantity'];
+    }
+    return $count;
+}
