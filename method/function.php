@@ -42,18 +42,8 @@ function get_best_seller_products($limit = 4)
     }
     return $products;
 }
-// function get_product_by_id($id)
-// {
-//     global $conn;
-//     $sql = "SELECT * FROM products WHERE id = :id";
-//     $stmt = $conn->prepare($sql);
-//     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-//     $stmt->execute();
 
-//     return $stmt->fetch(PDO::FETCH_ASSOC);
-// }
-
-
+// ==================== REVIEW FUNCTIONS ====================
 function get_store_reviews($limit = null)
 {
     global $conn;
@@ -349,4 +339,112 @@ function get_cart_item_count()
         $count += (int)$item['quantity'];
     }
     return $count;
+}
+
+
+// ==================== ADMIN FUNCTIONS ====================
+
+function admin_login($username, $password)
+{
+    global $conn;
+    $sql = "SELECT * FROM admin_users WHERE username = :username LIMIT 1";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':username', $username);
+    $stmt->execute();
+    $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($admin && password_verify($password, $admin['password'])) {
+        $_SESSION['admin_id'] = $admin['id'];
+        $_SESSION['admin_username'] = $admin['username'];
+        $_SESSION['admin_nama'] = $admin['nama_lengkap'];
+        return true;
+    }
+    return false;
+}
+
+function is_admin_logged_in()
+{
+    return isset($_SESSION['admin_id']);
+}
+
+function admin_logout()
+{
+    unset($_SESSION['admin_id']);
+    unset($_SESSION['admin_username']);
+    unset($_SESSION['admin_nama']);
+    session_destroy();
+}
+
+function get_all_orders($limit = 20, $offset = 0, $status = null)
+{
+    global $conn;
+    $sql = "SELECT * FROM orders";
+
+    if ($status) {
+        $sql .= " WHERE status = :status";
+    }
+
+    $sql .= " ORDER BY created_at DESC LIMIT :limit OFFSET :offset";
+
+    $stmt = $conn->prepare($sql);
+
+    if ($status) {
+        $stmt->bindParam(':status', $status);
+    }
+
+    $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+    $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function get_total_orders($status = null)
+{
+    global $conn;
+    $sql = "SELECT COUNT(*) as total FROM orders";
+
+    if ($status) {
+        $sql .= " WHERE status = :status";
+    }
+
+    $stmt = $conn->prepare($sql);
+
+    if ($status) {
+        $stmt->bindParam(':status', $status);
+    }
+
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $result['total'];
+}
+
+function update_order_status($order_id, $status)
+{
+    global $conn;
+    $sql = "UPDATE orders SET status = :status WHERE id = :order_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':status', $status);
+    $stmt->bindParam(':order_id', $order_id, PDO::PARAM_INT);
+    return $stmt->execute();
+}
+
+function get_dashboard_stats()
+{
+    global $conn;
+    $stats = [];
+
+    $stats['total_orders'] = get_total_orders();
+    $stats['pending_orders'] = get_total_orders('pending');
+    $stats['completed_orders'] = get_total_orders('selesai');
+
+    $sql = "SELECT SUM(total) as revenue FROM orders WHERE status = 'selesai'";
+    $result = $conn->query($sql)->fetch(PDO::FETCH_ASSOC);
+    $stats['total_revenue'] = $result['revenue'] ?? 0;
+
+    $sql = "SELECT COUNT(*) as today FROM orders WHERE DATE(created_at) = CURDATE()";
+    $result = $conn->query($sql)->fetch(PDO::FETCH_ASSOC);
+    $stats['today_orders'] = $result['today'];
+
+    return $stats;
 }
