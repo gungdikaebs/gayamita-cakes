@@ -7,7 +7,6 @@ if (is_admin_logged_in()) {
     header('Location: index.php');
     exit;
 }
-var_dump(password_hash('admin123', PASSWORD_DEFAULT)); // Example of hashing a password
 
 $error = '';
 
