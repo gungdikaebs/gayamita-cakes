@@ -1,4 +1,5 @@
 <?php
+// filepath: c:\laragon\www\gayamita-cakes\admin\components\sidebar.php
 if (!is_admin_logged_in()) {
     header('Location: login.php');
     exit;
@@ -28,9 +29,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <span class="font-medium">Kelola Pesanan</span>
         </a>
 
-        <a href="order-detail.php" class="flex items-center gap-4 px-6 py-3 mb-2 text-white/80 hover:bg-white/10 rounded-xl transition-all group <?= strpos($current_page, 'order-detail') !== false ? 'bg-white/20 text-white' : '' ?>">
-            <i class="fas fa-file-invoice w-6 text-lg"></i>
-            <span class="font-medium">Detail Pesanan</span>
+        <a href="products.php" class="flex items-center gap-4 px-6 py-3 mb-2 text-white/80 hover:bg-white/10 rounded-xl transition-all group <?= in_array($current_page, ['products.php', 'product-add.php', 'product-edit.php']) ? 'bg-white/20 text-white' : '' ?>">
+            <i class="fas fa-birthday-cake w-6 text-lg"></i>
+            <span class="font-medium">Kelola Produk</span>
         </a>
     </nav>
 

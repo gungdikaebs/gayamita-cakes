@@ -448,3 +448,151 @@ function get_dashboard_stats()
 
     return $stats;
 }
+
+
+// ==================== PRODUCT CRUD FUNCTIONS ====================
+
+function get_all_products_admin($limit = null, $offset = 0)
+{
+    global $conn;
+    $sql = "SELECT * FROM products ORDER BY id DESC";
+
+    if ($limit) {
+        $sql .= " LIMIT :limit OFFSET :offset";
+    }
+
+    $stmt = $conn->prepare($sql);
+
+    if ($limit) {
+        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+    }
+
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function get_total_products()
+{
+    global $conn;
+    $sql = "SELECT COUNT(*) as total FROM products";
+    $result = $conn->query($sql)->fetch(PDO::FETCH_ASSOC);
+    return $result['total'];
+}
+
+function get_product_by_id($id)
+{
+    global $conn;
+    $sql = "SELECT * FROM products WHERE id = :id LIMIT 1";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function create_product($data)
+{
+    global $conn;
+
+    $sql = "INSERT INTO products (nama, deskripsi, harga, image, rating) 
+            VALUES (:nama, :deskripsi, :harga, :image, :rating)";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':nama', $data['nama']);
+    $stmt->bindParam(':deskripsi', $data['deskripsi']);
+    $stmt->bindParam(':harga', $data['harga']);
+    $stmt->bindParam(':image', $data['image']);
+    $stmt->bindParam(':rating', $data['rating']);
+
+    return $stmt->execute();
+}
+
+function update_product($id, $data)
+{
+    global $conn;
+
+    $sql = "UPDATE products 
+            SET nama = :nama, 
+                deskripsi = :deskripsi, 
+                harga = :harga, 
+                image = :image, 
+                rating = :rating 
+            WHERE id = :id";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+    $stmt->bindParam(':nama', $data['nama']);
+    $stmt->bindParam(':deskripsi', $data['deskripsi']);
+    $stmt->bindParam(':harga', $data['harga']);
+    $stmt->bindParam(':image', $data['image']);
+    $stmt->bindParam(':rating', $data['rating']);
+
+    return $stmt->execute();
+}
+
+function delete_product($id)
+{
+    global $conn;
+
+    // Get product image to delete file
+    $product = get_product_by_id($id);
+
+    // Delete product from database
+    $sql = "DELETE FROM products WHERE id = :id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+
+    if ($stmt->execute()) {
+        // Delete image file if exists
+        if ($product && !empty($product['image'])) {
+            $image_path = __DIR__ . '/../public/assets/' . $product['image'];
+            if (file_exists($image_path)) {
+                unlink($image_path);
+            }
+        }
+        return true;
+    }
+
+    return false;
+}
+
+function upload_product_image($file)
+{
+    $target_dir = __DIR__ . "/../public/assets/images/product/";
+
+    // Create directory if not exists
+    if (!file_exists($target_dir)) {
+        mkdir($target_dir, 0777, true);
+    }
+
+    $file_extension = strtolower(pathinfo($file["name"], PATHINFO_EXTENSION));
+    $new_filename = uniqid('product_') . '.' . $file_extension;
+    $target_file = $target_dir . $new_filename;
+
+    // Check if image file is actual image
+    $check = getimagesize($file["tmp_name"]);
+    if ($check === false) {
+        return ['success' => false, 'message' => 'File bukan gambar!'];
+    }
+
+    // Check file size (max 5MB)
+    if ($file["size"] > 5000000) {
+        return ['success' => false, 'message' => 'Ukuran file terlalu besar! Max 5MB'];
+    }
+
+    // Allow certain file formats
+    $allowed_extensions = ["jpg", "jpeg", "png", "gif", "webp"];
+    if (!in_array($file_extension, $allowed_extensions)) {
+        return ['success' => false, 'message' => 'Format file tidak didukung! Gunakan JPG, PNG, GIF, atau WEBP'];
+    }
+
+    // Upload file
+    if (move_uploaded_file($file["tmp_name"], $target_file)) {
+        return [
+            'success' => true,
+            'path' => 'images/product/' . $new_filename
+        ];
+    } else {
+        return ['success' => false, 'message' => 'Gagal upload file!'];
+    }
+}
