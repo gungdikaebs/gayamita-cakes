@@ -8,7 +8,6 @@ if (is_admin_logged_in()) {
     exit;
 }
 
-var_dump(password_hash('admin123', PASSWORD_DEFAULT)); // Example hash generation
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
