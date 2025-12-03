@@ -14,6 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = trim($_POST['nama']);
     $deskripsi = trim($_POST['deskripsi']);
     $harga = (int)$_POST['harga'];
+    $rating = (int)$_POST['rating'];
 
     // Validate
     if (empty($nama) || empty($deskripsi) || $harga <= 0) {
@@ -30,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'deskripsi' => $deskripsi,
                 'harga' => $harga,
                 'image' => $upload_result['path'],
+                'rating' => $rating
             ];
 
             if (create_product($data)) {
@@ -91,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <form method="POST" enctype="multipart/form-data" class="space-y-6">
                         <!-- Nama Produk -->
                         <div>
-                            <label class="block text-gray-800 font-semibold mb-2 flex items-center gap-2">
+                            <label class=" text-gray-800 font-semibold mb-2 flex items-center gap-2">
                                 <i class="fas fa-tag text-amber-600"></i>
                                 Nama Produk
                             </label>
@@ -106,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="grid grid-cols-1 gap-4">
                             <!-- Harga -->
                             <div>
-                                <label class="block text-gray-800 font-semibold mb-2 flex items-center gap-2">
+                                <label class=" text-gray-800 font-semibold mb-2 flex items-center gap-2">
                                     <i class="fas fa-money-bill-wave text-amber-600"></i>
                                     Harga (Rp)
                                 </label>
@@ -117,12 +119,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     required>
                             </div>
 
+                            <div>
+                                <label class="block text-gray-800 font-semibold mb-2">Best Seller Rating (1-5)</label>
+                                <select name="rating"
+                                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-600 focus:ring-4 focus:ring-amber-100 outline-none transition-all"
+                                    required>
+                                    <option value="">Pilih Rating</option>
+                                    <option value="1"> ⭐ 1</option>
+                                    <option value="2">⭐⭐ 2</option>
+                                    <option value="3">⭐⭐⭐ 3</option>
+                                    <option value="4">⭐⭐⭐⭐ 4</option>
+                                    <option value="5">⭐⭐⭐⭐⭐ 5</option>
+                                </select>
+                            </div>
+
 
                         </div>
 
                         <!-- Deskripsi -->
                         <div>
-                            <label class="block text-gray-800 font-semibold mb-2 flex items-center gap-2">
+                            <label class=" text-gray-800 font-semibold mb-2 flex items-center gap-2">
                                 <i class="fas fa-align-left text-amber-600"></i>
                                 Deskripsi
                             </label>
@@ -134,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         <!-- Image Upload -->
                         <div>
-                            <label class="block text-gray-800 font-semibold mb-2 flex items-center gap-2">
+                            <label class=" text-gray-800 font-semibold mb-2 flex items-center gap-2">
                                 <i class="fas fa-image text-amber-600"></i>
                                 Gambar Produk
                             </label>

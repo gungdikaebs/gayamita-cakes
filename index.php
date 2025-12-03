@@ -1,4 +1,5 @@
 <?php
+session_start();
 $page = isset($_GET['page']) ? $_GET['page'] : 'beranda';
 
 // Daftar file yang boleh di-include

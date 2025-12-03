@@ -134,7 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <!-- Rating -->
                 <div>
-                    <label class="block text-gray-800 font-semibold mb-2">Rating (1-5)</label>
+                    <label class="block text-gray-800 font-semibold mb-2">Best Seller Rating (1-5)</label>
                     <select name="rating"
                         class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-600 focus:ring-4 focus:ring-amber-100 outline-none transition-all"
                         required>

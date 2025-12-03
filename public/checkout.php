@@ -21,6 +21,43 @@ if (empty($items)) {
     exit;
 }
 
+// Normalisasi nomor telepon: ubah "+62xxx" atau "0xxx" menjadi "62xxx" dan hilangkan karakter non-digit
+function normalize_phone($phone)
+{
+    $phone = trim((string)$phone);
+    if ($phone === '') return '';
+
+    // Hapus semua karakter kecuali digit dan plus
+    $phone = preg_replace('/[^\d+]/', '', $phone);
+
+    // Jika diawali +, buang +
+    if (substr($phone, 0, 1) === '+') {
+        $phone = substr($phone, 1);
+    }
+
+    // Jika mulai dengan 0 (contoh 0812...), ganti leading zero dengan 62
+    if (preg_match('/^0+/', $phone)) {
+        $phone = preg_replace('/^0+/', '62', $phone);
+    }
+
+    // Pastikan hanya digit
+    $phone = preg_replace('/\D/', '', $phone);
+
+    return $phone;
+}
+
+// Format nomor untuk ditampilkan di UI: tambah '+' jika berawalan '62'
+function format_phone_display($phone)
+{
+    $phone = trim((string)$phone);
+    if ($phone === '') return '';
+    $phone = preg_replace('/\D/', '', $phone);
+    if (substr($phone, 0, 2) === '62') {
+        return '+' . $phone;
+    }
+    return $phone;
+}
+
 // Handle form submission untuk checkout
 $errors = [];
 $redirect_url = '';
@@ -29,7 +66,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nama_lengkap'])) {
     // Validasi input
     $nama_lengkap = isset($_POST['nama_lengkap']) ? trim($_POST['nama_lengkap']) : '';
     $email = isset($_POST['email']) ? trim($_POST['email']) : '';
-    $no_telepon = isset($_POST['no_telepon']) ? trim($_POST['no_telepon']) : '';
+    // Ambil raw input lalu normalisasi ke format internasional '62...'
+    $raw_no = isset($_POST['no_telepon']) ? $_POST['no_telepon'] : '';
+    $no_telepon = normalize_phone($raw_no);
+    // Update $_POST agar nilai yang ditampilkan kembali ke user adalah versi yang telah dinormalisasi
+    $_POST['no_telepon'] = $no_telepon;
+
+    // Validasi panjang nomor (minimal 9, maksimal 15 digit sesuai E.164)
+    $digits_count = strlen(preg_replace('/\D/', '', $no_telepon));
+    if ($digits_count < 9 || $digits_count > 15) {
+        $errors[] = 'Nomor telepon tidak valid. Gunakan format 08xxxxxxxx atau +62xxxxxxxx (panjang 9-15 digit).';
+    }
     $alamat = isset($_POST['alamat']) ? trim($_POST['alamat']) : '';
     $kota = isset($_POST['kota']) ? trim($_POST['kota']) : '';
     $kode_pos = isset($_POST['kode_pos']) ? trim($_POST['kode_pos']) : '';
@@ -116,7 +163,7 @@ function rupiah($angka)
                             <div>
                                 <label for="no_telepon" class="block text-sm font-medium text-gray-700 mb-1">Nomor Telepon *</label>
                                 <input type="tel" id="no_telepon" name="no_telepon" required
-                                    value="<?php echo isset($_POST['no_telepon']) ? htmlspecialchars($_POST['no_telepon']) : ''; ?>"
+                                    value="<?php echo isset($no_telepon) ? htmlspecialchars(format_phone_display($no_telepon)) : (isset($_POST['no_telepon']) ? htmlspecialchars($_POST['no_telepon']) : ''); ?>"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
                             </div>
 
@@ -179,7 +226,6 @@ function rupiah($angka)
                 <div class="lg:col-span-1">
                     <div class="bg-white rounded-lg shadow-md p-6 sticky top-24">
                         <h2 class="text-xl font-semibold mb-4 pb-2 border-b">Ringkasan Pesanan</h2>
-
                         <div class="space-y-4 mb-4 max-h-64 overflow-y-auto">
                             <?php foreach ($items as $item): ?>
                                 <div class="flex items-center gap-3">

@@ -89,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <!-- Back Link -->
         <div class="text-center mt-6">
-            <a href="../public/beranda.php" class="text-orange-700 hover:text-amber-900 text-sm font-medium inline-flex items-center gap-2 hover:gap-3 transition-all">
+            <a href="../" class="text-orange-700 hover:text-amber-900 text-sm font-medium inline-flex items-center gap-2 hover:gap-3 transition-all">
                 <i class="fas fa-arrow-left"></i>
                 Kembali ke Website
             </a>
