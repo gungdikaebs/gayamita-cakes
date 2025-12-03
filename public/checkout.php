@@ -248,7 +248,7 @@ function rupiah($angka)
                             </div>
                         </div>
 
-                        <button type="submit" class="w-full mt-6 bg-primary text-white py-3 px-6 rounded-lg font-semibold hover:brightness-95 transition flex items-center justify-center gap-2">
+                        <button type="submit" class="w-full mt-6 bg-slate-900 text-white py-3 px-6 rounded-lg font-semibold hover:brightness-95 transition flex items-center justify-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                             </svg>

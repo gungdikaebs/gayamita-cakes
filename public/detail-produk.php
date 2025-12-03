@@ -21,7 +21,7 @@
     }
     ?>
 
-    <div class="mx-auto px-4 py-20 max-w-6xl">
+    <div class="mx-auto px-4 py-20 max-w-5xl min-h-screen">
         <?php if ($product): ?>
             <div class="bg-white rounded-2xl shadow-lg overflow-hidden grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
                 <!-- Gambar Produk -->
@@ -89,7 +89,7 @@
                                 <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
                                 <input type="hidden" name="quantity" id="quantity-hidden-buy" value="1">
                                 <input type="hidden" name="redirect" value="checkout">
-                                <button type="submit" class="w-full flex items-center justify-center gap-2 bg-primary text-white px-5 py-3 rounded-lg font-semibold shadow-lg hover:brightness-95 transition">
+                                <button type="submit" class="w-full flex items-center justify-center gap-2 bg-slate-900 text-white px-5 py-3 rounded-lg font-semibold shadow-lg hover:brightness-95 transition">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                     </svg>
