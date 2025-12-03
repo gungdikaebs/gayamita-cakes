@@ -42,82 +42,72 @@ function rupiah($angka)
     return 'Rp ' . number_format($angka, 0, ',', '.');
 }
 ?>
-<!DOCTYPE html>
-<html lang="id">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Keranjang Belanja</title>
-    <link rel="stylesheet" href="./assets/css/output.css">
-</head>
 
-<body class="bg-gray-50">
-    <div class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold mb-6">Keranjang Belanja</h1>
+<div class="container mx-auto px-4 py-8 min-h-screen">
+    <h1 class="text-3xl font-bold mb-6">Keranjang Belanja</h1>
 
-        <?php if (empty($items)): ?>
-            <div class="bg-white p-6 rounded-lg shadow text-center">
-                <p class="text-gray-500">Keranjang Anda kosong.</p>
-                <a href="index.php?page=produk" class="text-primary font-semibold">Lihat Produk</a>
-            </div>
-        <?php else: ?>
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                <table class="w-full border-collapse">
-                    <thead>
-                        <tr class="bg-gray-100">
-                            <th class="border px-4 py-2 text-left">Produk</th>
-                            <th class="border px-4 py-2 text-center">Jumlah</th>
-                            <th class="border px-4 py-2 text-right">Harga</th>
-                            <th class="border px-4 py-2 text-right">Subtotal</th>
-                            <th class="border px-4 py-2 text-center">Aksi</th>
+    <?php if (empty($items)): ?>
+        <div class="bg-white p-6 rounded-lg shadow text-center">
+            <p class="text-gray-500">Keranjang Anda kosong.</p>
+            <a href="index.php?page=produk" class="text-primary font-semibold">Lihat Produk</a>
+        </div>
+    <?php else: ?>
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="border px-4 py-2 text-left">Produk</th>
+                        <th class="border px-4 py-2 text-center">Jumlah</th>
+                        <th class="border px-4 py-2 text-right">Harga</th>
+                        <th class="border px-4 py-2 text-right">Subtotal</th>
+                        <th class="border px-4 py-2 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($items as $item): ?>
+                        <?php $subtotal = $item['quantity'] * $item['price_snapshot']; ?>
+                        <?php $total += $subtotal; ?>
+                        <tr>
+                            <td class="border px-4 py-2">
+                                <div class="flex items-center">
+                                    <img src="assets/<?php echo htmlspecialchars($item['image']); ?>"
+                                        alt="<?php echo htmlspecialchars($item['image']); ?>?>" class="w-16 h-16 object-cover rounded-md mr-4">
+                                    <span><?php echo htmlspecialchars($item['nama']); ?></span>
+
+                                </div>
+                            </td>
+                            <td class="border px-4 py-2 text-center">
+                                <form action="index.php?page=keranjang" method="POST" class="inline">
+                                    <input type="hidden" name="action" value="update">
+                                    <input type="hidden" name="cart_item_id" value="<?php echo $item['cart_item_id']; ?>">
+                                    <input type="number" name="quantity" value="<?php echo $item['quantity']; ?>" min="1" class="w-16 text-center border rounded">
+                                    <button type="submit" class="ml-2 bg-primary text-white px-2 py-1 rounded">Update</button>
+                                </form>
+                            </td>
+                            <td class="border px-4 py-2 text-right"><?php echo rupiah($item['price_snapshot']); ?></td>
+                            <td class="border px-4 py-2 text-right"><?php echo rupiah($subtotal); ?></td>
+                            <td class="border px-4 py-2 text-center">
+                                <form action="index.php?page=keranjang" method="POST" class="inline">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="cart_item_id" value="<?php echo $item['cart_item_id']; ?>">
+                                    <button type="submit" class="bg-red-500 text-white px-2 py-1 rounded">Hapus</button>
+                                </form>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($items as $item): ?>
-                            <?php $subtotal = $item['quantity'] * $item['price_snapshot']; ?>
-                            <?php $total += $subtotal; ?>
-                            <tr>
-                                <td class="border px-4 py-2">
-                                    <div class="flex items-center">
-                                        <img src="<?php echo htmlspecialchars($item['image']); ?>" alt="<?php echo htmlspecialchars($item['nama']); ?>" class="w-16 h-16 object-cover rounded-md mr-4">
-                                        <span><?php echo htmlspecialchars($item['nama']); ?></span>
-                                    </div>
-                                </td>
-                                <td class="border px-4 py-2 text-center">
-                                    <form action="index.php?page=keranjang" method="POST" class="inline">
-                                        <input type="hidden" name="action" value="update">
-                                        <input type="hidden" name="cart_item_id" value="<?php echo $item['cart_item_id']; ?>">
-                                        <input type="number" name="quantity" value="<?php echo $item['quantity']; ?>" min="1" class="w-16 text-center border rounded">
-                                        <button type="submit" class="ml-2 bg-primary text-white px-2 py-1 rounded">Update</button>
-                                    </form>
-                                </td>
-                                <td class="border px-4 py-2 text-right"><?php echo rupiah($item['price_snapshot']); ?></td>
-                                <td class="border px-4 py-2 text-right"><?php echo rupiah($subtotal); ?></td>
-                                <td class="border px-4 py-2 text-center">
-                                    <form action="index.php?page=keranjang" method="POST" class="inline">
-                                        <input type="hidden" name="action" value="delete">
-                                        <input type="hidden" name="cart_item_id" value="<?php echo $item['cart_item_id']; ?>">
-                                        <button type="submit" class="bg-red-500 text-white px-2 py-1 rounded">Hapus</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                    <tfoot>
-                        <tr class="bg-gray-100">
-                            <td colspan="3" class="border px-4 py-2 text-right font-bold">Total</td>
-                            <td colspan="2" class="border px-4 py-2 text-right font-bold"><?php echo rupiah($total); ?></td>
-                        </tr>
-                    </tfoot>
-                </table>
-                <div class="p-4 flex justify-between items-center">
-                    <a href="index.php?page=produk" class="bg-gray-200 text-gray-700 px-4 py-2 rounded">Lanjut Belanja</a>
-                    <a href="index.php?page=checkout" class="bg-primary text-white px-4 py-2 rounded">Checkout</a>
-                </div>
+                    <?php endforeach; ?>
+                </tbody>
+                <tfoot>
+                    <tr class="bg-gray-100">
+                        <td colspan="3" class="border px-4 py-2 text-right font-bold">Total</td>
+                        <td colspan="2" class="border px-4 py-2 text-right font-bold"><?php echo rupiah($total); ?></td>
+                    </tr>
+                </tfoot>
+            </table>
+            <div class="p-4 flex justify-between items-center">
+                <a href="index.php?page=produk" class="bg-gray-200 text-gray-700 px-4 py-2 rounded">Lanjut Belanja</a>
+                <a href="index.php?page=checkout" class="bg-primary text-white px-4 py-2 rounded">Checkout</a>
             </div>
-        <?php endif; ?>
-    </div>
-</body>
-
-</html>
+        </div>
+    <?php endif; ?>
+</div>

@@ -451,7 +451,6 @@ function get_dashboard_stats()
 
 
 // ==================== PRODUCT CRUD FUNCTIONS ====================
-
 function get_all_products_admin($limit = null, $offset = 0)
 {
     global $conn;
@@ -494,16 +493,14 @@ function create_product($data)
 {
     global $conn;
 
-    $sql = "INSERT INTO products (nama, deskripsi, harga, image, rating) 
-            VALUES (:nama, :deskripsi, :harga, :image, :rating)";
+    $sql = "INSERT INTO products (nama, deskripsi, harga, image) 
+            VALUES (:nama, :deskripsi, :harga, :image)";
 
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':nama', $data['nama']);
     $stmt->bindParam(':deskripsi', $data['deskripsi']);
     $stmt->bindParam(':harga', $data['harga']);
     $stmt->bindParam(':image', $data['image']);
-    $stmt->bindParam(':rating', $data['rating']);
-
     return $stmt->execute();
 }
 
@@ -516,7 +513,6 @@ function update_product($id, $data)
                 deskripsi = :deskripsi, 
                 harga = :harga, 
                 image = :image, 
-                rating = :rating 
             WHERE id = :id";
 
     $stmt = $conn->prepare($sql);
@@ -525,8 +521,6 @@ function update_product($id, $data)
     $stmt->bindParam(':deskripsi', $data['deskripsi']);
     $stmt->bindParam(':harga', $data['harga']);
     $stmt->bindParam(':image', $data['image']);
-    $stmt->bindParam(':rating', $data['rating']);
-
     return $stmt->execute();
 }
 
@@ -545,7 +539,7 @@ function delete_product($id)
     if ($stmt->execute()) {
         // Delete image file if exists
         if ($product && !empty($product['image'])) {
-            $image_path = __DIR__ . '/../public/assets/' . $product['image'];
+            $image_path = __DIR__ . '/../assets/' . $product['image'];
             if (file_exists($image_path)) {
                 unlink($image_path);
             }
@@ -558,7 +552,7 @@ function delete_product($id)
 
 function upload_product_image($file)
 {
-    $target_dir = __DIR__ . "/../public/assets/images/product/";
+    $target_dir = __DIR__ . "/../assets/images/product/";
 
     // Create directory if not exists
     if (!file_exists($target_dir)) {

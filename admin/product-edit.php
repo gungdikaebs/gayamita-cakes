@@ -160,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div>
                     <label class="block text-gray-800 font-semibold mb-2">Gambar Saat Ini</label>
                     <div class="mb-4">
-                        <img src="../public/assets/<?= htmlspecialchars($product['image']) ?>"
+                        <img src="../assets/<?= htmlspecialchars($product['image']) ?>"
                             alt="<?= htmlspecialchars($product['nama']) ?>"
                             class="w-48 h-48 object-cover rounded-xl shadow-lg">
                     </div>

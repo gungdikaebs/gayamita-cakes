@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Oct 02, 2025 at 10:23 AM
+-- Host: localhost:3306
+-- Generation Time: Dec 03, 2025 at 01:32 PM
 -- Server version: 8.0.30
--- PHP Version: 8.2.27
+-- PHP Version: 8.3.6
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,16 +24,139 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `admin_users`
+--
+
+CREATE TABLE `admin_users` (
+  `id` int NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `nama_lengkap` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `admin_users`
+--
+
+INSERT INTO `admin_users` (`id`, `username`, `password`, `nama_lengkap`, `email`, `created_at`) VALUES
+(1, 'admin', '$2y$10$5E/IKkn0A0pJ2Pab7KSPyeh7p0B18w6YmsYYk7d1kkm0AkBox8pei', 'Administrator', 'admin@gayamitacakes.com', '2025-12-02 15:06:09');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `carts`
+--
+
+CREATE TABLE `carts` (
+  `id` int NOT NULL,
+  `session_id` varchar(128) NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `carts`
+--
+
+INSERT INTO `carts` (`id`, `session_id`, `created_at`, `updated_at`) VALUES
+(1, '', '2025-12-02 23:21:25', '2025-12-02 23:21:25');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cart_items`
+--
+
+CREATE TABLE `cart_items` (
+  `id` int NOT NULL,
+  `cart_id` int NOT NULL,
+  `product_id` int NOT NULL,
+  `quantity` int NOT NULL DEFAULT '1',
+  `price_snapshot` int NOT NULL DEFAULT '0',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `cart_items`
+--
+
+INSERT INTO `cart_items` (`id`, `cart_id`, `product_id`, `quantity`, `price_snapshot`, `created_at`, `updated_at`) VALUES
+(2, 1, 6, 6, 30000, '2025-12-03 20:44:30', '2025-12-03 20:48:23'),
+(3, 1, 3, 8, 160000, '2025-12-03 20:48:54', '2025-12-03 21:08:28'),
+(4, 1, 7, 7, 40000, '2025-12-03 21:08:56', '2025-12-03 21:10:48');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `orders`
+--
+
+CREATE TABLE `orders` (
+  `id` int NOT NULL,
+  `order_number` varchar(50) NOT NULL,
+  `session_id` varchar(128) NOT NULL,
+  `nama_lengkap` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `no_telepon` varchar(20) NOT NULL,
+  `alamat` text NOT NULL,
+  `kota` varchar(100) NOT NULL,
+  `kode_pos` varchar(10) NOT NULL,
+  `catatan` text,
+  `metode_pembayaran` enum('transfer','cod') NOT NULL DEFAULT 'transfer',
+  `status` enum('pending','dikonfirmasi','diproses','dikirim','selesai','dibatalkan') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'pending',
+  `total` int NOT NULL DEFAULT '0',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `orders`
+--
+
+INSERT INTO `orders` (`id`, `order_number`, `session_id`, `nama_lengkap`, `email`, `no_telepon`, `alamat`, `kota`, `kode_pos`, `catatan`, `metode_pembayaran`, `status`, `total`, `created_at`, `updated_at`) VALUES
+(1, 'GMC2025120211D52B', '', 'Reprehenderit non repellendus esse culpa eaque repudiandae.', 'your.email+fakedata95845@gmail.com', '765-950-0598', 'Aliquam id hic.', 'Saepe repudiandae reiciendis ducimus enim.', '56248-3031', 'Arlie Bergstrom', 'transfer', 'diproses', 170000, '2025-12-02 23:21:50', '2025-12-02 23:26:24');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `order_items`
+--
+
+CREATE TABLE `order_items` (
+  `id` int NOT NULL,
+  `order_id` int NOT NULL,
+  `product_id` int NOT NULL,
+  `product_name` varchar(255) NOT NULL,
+  `product_image` varchar(255) DEFAULT NULL,
+  `quantity` int NOT NULL DEFAULT '1',
+  `price` int NOT NULL DEFAULT '0',
+  `subtotal` int NOT NULL DEFAULT '0',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `order_items`
+--
+
+INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `product_name`, `product_image`, `quantity`, `price`, `subtotal`, `created_at`) VALUES
+(1, 1, 2, 'Cheese Cake', 'images/product/cheesecake.png', 1, 170000, 170000, '2025-12-02 23:21:50');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `products`
 --
 
 CREATE TABLE `products` (
   `id` int NOT NULL,
-  `nama` varchar(100) NOT NULL,
-  `harga` varchar(20) NOT NULL,
-  `deskripsi` text NOT NULL,
-  `rating` decimal(10,0) NOT NULL,
-  `image` varchar(100) NOT NULL
+  `nama` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `harga` varchar(20) COLLATE utf8mb4_general_ci NOT NULL,
+  `deskripsi` text COLLATE utf8mb4_general_ci NOT NULL,
+  `rating` decimal(10,0) DEFAULT NULL,
+  `image` varchar(100) COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -61,8 +184,8 @@ INSERT INTO `products` (`id`, `nama`, `harga`, `deskripsi`, `rating`, `image`) V
 CREATE TABLE `reviews` (
   `id` int NOT NULL,
   `rating` decimal(10,0) NOT NULL,
-  `nama` varchar(100) NOT NULL,
-  `deskripsi` text NOT NULL
+  `nama` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `deskripsi` text COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -83,6 +206,44 @@ INSERT INTO `reviews` (`id`, `rating`, `nama`, `deskripsi`) VALUES
 --
 
 --
+-- Indexes for table `admin_users`
+--
+ALTER TABLE `admin_users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username` (`username`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
+-- Indexes for table `carts`
+--
+ALTER TABLE `carts`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `session_idx` (`session_id`);
+
+--
+-- Indexes for table `cart_items`
+--
+ALTER TABLE `cart_items`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `cart_idx` (`cart_id`);
+
+--
+-- Indexes for table `orders`
+--
+ALTER TABLE `orders`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `order_number` (`order_number`),
+  ADD KEY `session_idx` (`session_id`),
+  ADD KEY `order_number_idx` (`order_number`);
+
+--
+-- Indexes for table `order_items`
+--
+ALTER TABLE `order_items`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `order_idx` (`order_id`);
+
+--
 -- Indexes for table `products`
 --
 ALTER TABLE `products`
@@ -99,130 +260,63 @@ ALTER TABLE `reviews`
 --
 
 --
+-- AUTO_INCREMENT for table `admin_users`
+--
+ALTER TABLE `admin_users`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `carts`
+--
+ALTER TABLE `carts`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `cart_items`
+--
+ALTER TABLE `cart_items`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `orders`
+--
+ALTER TABLE `orders`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `order_items`
+--
+ALTER TABLE `order_items`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `reviews`
 --
 ALTER TABLE `reviews`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `cart_items`
+--
+ALTER TABLE `cart_items`
+  ADD CONSTRAINT `fk_cart_items_cart` FOREIGN KEY (`cart_id`) REFERENCES `carts` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `order_items`
+--
+ALTER TABLE `order_items`
+  ADD CONSTRAINT `fk_order_items_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE;
 COMMIT;
-
-CREATE TABLE IF NOT EXISTS `carts` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `session_id` VARCHAR(128) NOT NULL,
-  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `session_idx` (`session_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- Tabel cart_items: menyimpan item di dalam keranjang
-CREATE TABLE IF NOT EXISTS `cart_items` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `cart_id` INT NOT NULL,
-  `product_id` INT NOT NULL,
-  `quantity` INT NOT NULL DEFAULT 1,
-  `price_snapshot` INT NOT NULL DEFAULT 0,
-  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `cart_idx` (`cart_id`),
-  CONSTRAINT `fk_cart_items_cart` FOREIGN KEY (`cart_id`) REFERENCES `carts` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- Tabel untuk menyimpan data pesanan
-CREATE TABLE IF NOT EXISTS `orders` (
-    `id` INT NOT NULL AUTO_INCREMENT,
-    `order_number` VARCHAR(50) NOT NULL UNIQUE,
-    `session_id` VARCHAR(128) NOT NULL,
-    `nama_lengkap` VARCHAR(255) NOT NULL,
-    `email` VARCHAR(255) NOT NULL,
-    `no_telepon` VARCHAR(20) NOT NULL,
-    `alamat` TEXT NOT NULL,
-    `kota` VARCHAR(100) NOT NULL,
-    `kode_pos` VARCHAR(10) NOT NULL,
-    `catatan` TEXT NULL,
-    `metode_pembayaran` ENUM('transfer', 'cod') NOT NULL DEFAULT 'transfer',
-    `status` ENUM('pending', 'dikonfirmasi', 'diproses', 'dikirim', 'selesai', 'dibatalkan') NOT NULL DEFAULT 'pending',
-    `total` INT NOT NULL DEFAULT 0,
-    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    KEY `session_idx` (`session_id`),
-    KEY `order_number_idx` (`order_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- Tabel untuk menyimpan item pesanan
-CREATE TABLE IF NOT EXISTS `orders` (
-    `id` INT NOT NULL AUTO_INCREMENT,
-    `order_number` VARCHAR(50) NOT NULL UNIQUE,
-    `session_id` VARCHAR(128) NOT NULL,
-    `nama_lengkap` VARCHAR(255) NOT NULL,
-    `email` VARCHAR(255) NOT NULL,
-    `no_telepon` VARCHAR(20) NOT NULL,
-    `alamat` TEXT NOT NULL,
-    `kota` VARCHAR(100) NOT NULL,
-    `kode_pos` VARCHAR(10) NOT NULL,
-    `catatan` TEXT NULL,
-    `metode_pembayaran` ENUM('transfer', 'cod') NOT NULL DEFAULT 'transfer',
-    `status` ENUM('pending', 'dikonfirmasi', 'diproses', 'dikirim', 'selesai', 'dibatalkan') NOT NULL DEFAULT 'pending',
-    `total` INT NOT NULL DEFAULT 0,
-    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    KEY `session_idx` (`session_id`),
-    KEY `order_number_idx` (`order_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- Tabel untuk menyimpan item pesanan
-CREATE TABLE IF NOT EXISTS `order_items` (
-    `id` INT NOT NULL AUTO_INCREMENT,
-    `order_id` INT NOT NULL,
-    `product_id` INT NOT NULL,
-    `product_name` VARCHAR(255) NOT NULL,
-    `product_image` VARCHAR(255) NULL,
-    `quantity` INT NOT NULL DEFAULT 1,
-    `price` INT NOT NULL DEFAULT 0,
-    `subtotal` INT NOT NULL DEFAULT 0,
-    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    KEY `order_idx` (`order_id`),
-    CONSTRAINT `fk_order_items_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- Tabel admin users
-CREATE TABLE IF NOT EXISTS admin_users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    nama_lengkap VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Insert default admin (username: admin, password: admin123)
-INSERT INTO admin_users (username, password, nama_lengkap, email) 
-VALUES ('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Administrator', 'admin@gayamitacakes.com');
-
-
-CREATE TABLE IF NOT EXISTS admin_users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    nama_lengkap VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Insert default admin (username: admin, password: admin123)
-INSERT INTO admin_users (username, password, nama_lengkap, email) 
-VALUES ('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Administrator', 'admin@gayamitacakes.com');
-
-
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
